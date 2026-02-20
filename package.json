@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "RIFT26QC project",
   "scripts": {
-    "build": "echo 'No build needed'",
+    "build": "mkdir -p dist && cp -r public/* dist/",
     "deploy": "vercel --prod"
   },
   "devDependencies": {
