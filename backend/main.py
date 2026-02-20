@@ -169,10 +169,12 @@ def analyze(file: UploadFile = File(...)):
         return JSONResponse(content=response)
     except HTTPException:
         raise
-    except Exception as e:
+    except BaseException as e:
         import traceback
+        print("CRITICAL ERROR IN ANALYSIS PIPELINE:")
         print(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+        error_detail = str(e) or "Unknown internal error"
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {error_detail}")
 
 
 # ── Account Deep-Dive ─────────────────────────────────────────────

@@ -438,11 +438,31 @@ async function runAnalysis() {
     try {
         const res = await fetch(fetchUrl, { method: 'POST', body: formData });
         console.log('Fetch response status:', res.status, res.statusText);
+
         if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.detail || 'Analysis failed');
+            let errorMsg = 'Analysis failed';
+            try {
+                // Try reading as JSON first
+                const errJson = await res.json();
+                errorMsg = errJson.detail || errorMsg;
+            } catch (e) {
+                // Fallback to text if JSON parsing fails
+                const errText = await res.text();
+                errorMsg = `Server Error (${res.status}): ${errText.substring(0, 200)}`;
+            }
+            throw new Error(errorMsg);
         }
-        const data = await res.json();
+
+        // Handle success response safely
+        let data;
+        try {
+            const text = await res.text();
+            if (!text || text.trim() === "") throw new Error('Empty response from server');
+            data = JSON.parse(text);
+        } catch (e) {
+            throw new Error(`Invalid JSON response: ${e.message}`);
+        }
+
         console.log('Analysis data received successfully');
         State.data = data;
         State.legitimateAccounts.clear();
