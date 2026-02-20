@@ -6,6 +6,9 @@
     "build": "mkdir -p dist && cp -r public/* dist/",
     "deploy": "vercel --prod"
   },
+  "dependencies": {
+    "csv-parse": "^5.5.0"
+  },
   "devDependencies": {
     "vercel": "^50.20.0"
   }
