@@ -442,13 +442,15 @@ async function runAnalysis() {
         if (!res.ok) {
             let errorMsg = 'Analysis failed';
             try {
-                // Try reading as JSON first
-                const errJson = await res.json();
-                errorMsg = errJson.detail || errorMsg;
-            } catch (e) {
-                // Fallback to text if JSON parsing fails
                 const errText = await res.text();
-                errorMsg = `Server Error (${res.status}): ${errText.substring(0, 200)}`;
+                try {
+                    const errJson = JSON.parse(errText);
+                    errorMsg = errJson.detail || errorMsg;
+                } catch (parseErr) {
+                    errorMsg = `Server Error (${res.status}): ${errText.substring(0, 200)}`;
+                }
+            } catch (readErr) {
+                errorMsg = `Server Error (${res.status}): Unable to read response`;
             }
             throw new Error(errorMsg);
         }

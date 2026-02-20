@@ -1,0 +1,7 @@
+Fix for Response Body Consumed Issue
+
+In the frontend app.js, the fetch error handling was modified to always use res.text() first before attempting JSON parsing. This prevents potential "Response body already consumed" errors that could occur when trying to read the response body multiple times.
+
+Previous code tried res.json() first, which consumes the body, and if it fails, then res.text(), but in some cases, this could lead to issues.
+
+New code always calls res.text() once, then parses as JSON if possible.
