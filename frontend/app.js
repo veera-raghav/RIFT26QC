@@ -432,7 +432,7 @@ async function runAnalysis() {
     const formData = new FormData();
     formData.append('file', State.uploadedFile);
 
-    const fetchUrl = '/.netlify/functions/analyze';
+    const fetchUrl = '/analyze';
     console.log('Fetching:', fetchUrl);
 
     try {
