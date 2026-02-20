@@ -47,12 +47,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── Static files ──────────────────────────────────────────────────
+# Static files directory
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 _FRONTEND_DIR = _PROJECT_ROOT / "frontend"
-
-if _FRONTEND_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(_FRONTEND_DIR)), name="static")
 
 # ── Module-level store for the latest analysis result ─────────────
 _last_result: dict | None = None
@@ -65,13 +62,6 @@ def health():
     return {"status": "ok"}
 
 
-@app.get("/")
-def root():
-    """Serve the frontend index.html."""
-    index_file = _FRONTEND_DIR / "index.html"
-    if index_file.exists():
-        return FileResponse(str(index_file), media_type="text/html")
-    return {"status": "ok", "service": "Money Muling Detection Engine"}
 
 
 # ── Analyze ───────────────────────────────────────────────────────
@@ -292,6 +282,11 @@ def download_json():
         content=download_payload,
         headers={"Content-Disposition": 'attachment; filename="analysis_result.json"'},
     )
+
+# ── Serve Frontend ────────────────────────────────────────────────
+# Mount at root last so it doesn't override API routes
+if _FRONTEND_DIR.exists():
+    app.mount("/", StaticFiles(directory=str(_FRONTEND_DIR), html=True), name="frontend")
 
 
 if __name__ == "__main__":
